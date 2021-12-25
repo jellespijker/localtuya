@@ -77,7 +77,6 @@
                     "fan_speed_high": "Fan High Speed Setting",
                     "current_temperature_dp": "Current Temperature",
                     "target_temperature_dp": "Target Temperature",
-                    "fan_mode_dp": "Fan Mode (optional)",
                     "temperature_step": "Temperature Step (optional)",
                     "max_temperature_dp": "Max Temperature (optional)",
                     "min_temperature_dp": "Min Temperature (optional)",
@@ -92,7 +91,7 @@
                     "preset_set": "Presets Set (optional)",
                     "eco_dp": "Eco DP (optional)",
                     "eco_value": "Eco value (optional)",
-                    "euristic_action": "Enable euristic action (optional)"
+                    "heuristic_action": "Enable heuristic action (optional)"
                 }
             }
         }
@@ -147,7 +146,6 @@
                     "fan_speed_high": "Fan High Speed Setting",
                     "current_temperature_dp": "Current Temperature",
                     "target_temperature_dp": "Target Temperature",
-                    "fan_mode_dp": "Fan Mode (optional)",
                     "temperature_step": "Temperature Step (optional)",
                     "max_temperature_dp": "Max Temperature (optional)",
                     "min_temperature_dp": "Min Temperature (optional)",
@@ -162,7 +160,7 @@
                     "preset_set": "Presets Set (optional)",
                     "eco_dp": "Eco DP (optional)",
                     "eco_value": "Eco value (optional)",
-                    "euristic_action": "Enable euristic action (optional)"
+                    "heuristic_action": "Enable heuristic action (optional)"
                 }
             },
             "yaml_import": {
