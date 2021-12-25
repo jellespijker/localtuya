@@ -29,7 +29,8 @@
                     "host": "Host",
                     "device_id": "Device ID",
                     "local_key": "Local key",
-                    "protocol_version": "Protocol Version"
+                    "protocol_version": "Protocol Version",
+                    "scan_interval": "Scan interval (seconds, only when not updating automatically)"
                 }
             },
             "pick_entity_type": {
@@ -91,7 +92,11 @@
                     "preset_set": "Presets Set (optional)",
                     "eco_dp": "Eco DP (optional)",
                     "eco_value": "Eco value (optional)",
-                    "heuristic_action": "Enable heuristic action (optional)"
+                    "heuristic_action": "Enable heuristic action (optional)",
+                    "max_value": "Maximum Value",
+                    "min_value": "Minimum Value",
+                    "select_options": "Valid entries, separate entries by a ;",
+                    "select_options_friendly": "User Friendly options, separate entries by a ;"
                 }
             }
         }
@@ -106,6 +111,7 @@
                     "host": "Host",
                     "local_key": "Local key",
                     "protocol_version": "Protocol Version",
+                    "scan_interval": "Scan interval (seconds, only when not updating automatically)",
                     "entities": "Entities (uncheck an entity to remove it)"
                 }
             },
@@ -160,7 +166,11 @@
                     "preset_set": "Presets Set (optional)",
                     "eco_dp": "Eco DP (optional)",
                     "eco_value": "Eco value (optional)",
-                    "heuristic_action": "Enable heuristic action (optional)"
+                    "heuristic_action": "Enable heuristic action (optional)",
+                    "max_value": "Maximum Value",
+                    "min_value": "Minimum Value",
+                    "select_options": "Valid entries, separate entries by a ;",
+                    "select_options_friendly": "User Friendly options, separate entries by a ;"
                 }
             },
             "yaml_import": {

@@ -21,6 +21,7 @@ Functions
    json = status()          # returns json payload
    set_version(version)     #  3.1 [default] or 3.3
    detect_available_dps()   # returns a list of available dps provided by the device
+   update_dps(dps)          # sends update dps command
    add_dps_to_request(dp_index)  # adds dp_index to the list of dps used by the
                                   # device (to be queried in the payload)
    set_dp(on, dp_index)   # Set value of any dps index.
@@ -61,7 +62,7 @@ TuyaMessage = namedtuple("TuyaMessage", "seqno cmd retcode payload crc")
 SET = "set"
 STATUS = "status"
 HEARTBEAT = "heartbeat"
-UPDATEDPS = "updatedps"      # Request refresh of DPS
+UPDATEDPS = "updatedps"  # Request refresh of DPS
 
 PROTOCOL_VERSION_BYTES_31 = b"3.1"
 PROTOCOL_VERSION_BYTES_33 = b"3.3"
@@ -76,6 +77,9 @@ PREFIX_VALUE = 0x000055AA
 SUFFIX_VALUE = 0x0000AA55
 
 HEARTBEAT_INTERVAL = 10
+
+# DPS that are known to be safe to use with update_dps (0x12) command
+UPDATE_DPS_WHITELIST = [18, 19, 20]  # Socket (Wi-Fi)
 
 # This is intended to match requests.json payload at
 # https://github.com/codetheweb/tuyapi :
@@ -295,6 +299,8 @@ class MessageDispatcher(ContextualLogger):
                 sem = self.listeners[self.HEARTBEAT_SEQNO]
                 self.listeners[self.HEARTBEAT_SEQNO] = msg
                 sem.release()
+        elif msg.cmd == 0x12:
+            self.debug("Got normal updatedps response")
         elif msg.cmd == 0x08:
             self.debug("Got status update")
             self.listener(msg)
@@ -382,7 +388,6 @@ class TuyaProtocol(asyncio.Protocol, ContextualLogger):
             while True:
                 try:
                     await self.heartbeat()
-                    await self.updatedps()
                     await asyncio.sleep(HEARTBEAT_INTERVAL)
                 except asyncio.CancelledError:
                     self.debug("Stopped heartbeat loop")
@@ -482,15 +487,25 @@ class TuyaProtocol(asyncio.Protocol, ContextualLogger):
         """Send a heartbeat message."""
         return await self.exchange(HEARTBEAT)
 
-    async def updatedps(self):
+    async def update_dps(self, dps=None):
         """
         Request device to update index.
+
         Args:
-            index(array): list of dps to update (ex. [4, 5, 6, 18, 19, 20])
+            dps([int]): list of dps to update, default=detected&whitelisted
         """
-        self.debug('updatedps() entry (dev_type is %s)', self.dev_type)
-        payload = self._generate_payload(UPDATEDPS)
-        self.transport.write(payload)
+        if self.version == 3.3:
+            if dps is None:
+                if not self.dps_cache:
+                    await self.detect_available_dps()
+                if self.dps_cache:
+                    dps = [int(dp) for dp in self.dps_cache]
+                    # filter non whitelisted dps
+                    dps = list(set(dps).intersection(set(UPDATE_DPS_WHITELIST)))
+            self.debug("updatedps() entry (dps %s, dps_cache %s)", dps, self.dps_cache)
+            payload = self._generate_payload(UPDATEDPS, dps)
+            self.transport.write(payload)
+        return True
 
     async def set_dp(self, value, dp_index):
         """
@@ -608,7 +623,7 @@ class TuyaProtocol(asyncio.Protocol, ContextualLogger):
 
         if self.version == 3.3:
             payload = self.cipher.encrypt(payload, False)
-            if command_hb != 0x0A and command_hb != 0x12:
+            if command_hb not in [0x0A, 0x12]:
                 # add the 3.3 header
                 payload = PROTOCOL_33_HEADER + payload
         elif command == SET:
