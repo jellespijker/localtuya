@@ -180,6 +180,11 @@ class TuyaDevice(pytuya.TuyaListener, pytuya.ContextualLogger):
                     self._async_refresh,
                     timedelta(seconds=self._config_entry[CONF_SCAN_INTERVAL]),
                 )
+        except OSError:
+            _LOGGER.warning(f"Could not reach {self._config_entry[CONF_HOST]}, device might be offline.")
+            if self._interface is not None:
+                await self._interface.close()
+                self._interface = None
         except Exception:  # pylint: disable=broad-except
             self.exception(f"Connect to {self._config_entry[CONF_HOST]} failed")
             if self._interface is not None:
